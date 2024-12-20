@@ -1,0 +1,31 @@
+name: Send Webhook Event Data
+
+on:
+  push:
+    branches:
+      - '**'   # This will trigger the action on all branches, including force pushes
+
+jobs:
+  send-webhook:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Send Push Event Data to Webhook
+        run: |
+          curl -X POST https://webhook-test.com/c044efd2c85f965403c50192e2d0ae06 \
+          -H "Content-Type: application/json" \
+          -d '{
+                "event": "${{ github.event_name }}",
+                "ref": "${{ github.ref }}",
+                "repository": "${{ github.repository }}",
+                "sender": "${{ github.actor }}",
+                "push": {
+                    "head_commit": "${{ github.event.head_commit }}",
+                    "push_id": "${{ github.event.push_id }}",
+                    "commits": "${{ toJson(github.event.commits) }}",
+                    "forced": "${{ github.event.forced }}"
+                }
+              }'
